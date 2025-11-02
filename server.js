@@ -1,5 +1,6 @@
-const e = require('cors');
+const {prodValidationSchema} = require('./validation_Middleware/validationschema')
 const express = require('express');
+const { matchedData,checkSchema,validationResult} = require('express-validator');
 const app = express();
 app.use(express.json());
 
@@ -41,8 +42,13 @@ app.get('/api/prod/:id',(req,res)=>{
   res.send(product);
 })  
 //post request
-app.post('/api/prod',(req,res)=>{
-  console.log(req.body);
+app.post('/api/prod',checkSchema(prodValidationSchema),(req,res)=>{
+  const result = validationResult(req);
+  // console.log(result);
+  if(!result.isEmpty()){
+    return res.status(400).send({validationError:result.array()});
+  }
+  // console.log(req.body);
   const product = req.body;
   const newUser = {id:prod.length + 1, ...product};
 
